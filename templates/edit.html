@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit: {{ filename }}</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+    :root {
+      --bg:#050a0e;
+      --panel:#0a1520;
+      --border:#1a3040;
+      --accent:#00d4ff;
+      --accent2:#00ff88;
+      --danger:#ff3860;
+      --warn:#ffb020;
+      --text:#c8dce8;
+      --text-dim:#607080;
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0;}
+
+    body{
+      background:var(--bg);
+      color:var(--text);
+      font-family:'Rajdhani',sans-serif;
+    }
+
+    header{
+      background:var(--panel);
+      border-bottom:1px solid var(--border);
+      padding:16px 24px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+
+    .filename{
+      font-family:'Share Tech Mono',monospace;
+      color:var(--accent);
+    }
+
+    .btn{
+      padding:8px 14px;
+      border:1px solid var(--border);
+      color:var(--text-dim);
+      text-decoration:none;
+      font-size:11px;
+      transition:.2s;
+    }
+
+    .btn:hover{
+      border-color:var(--accent);
+      color:var(--accent);
+    }
+
+    .btn-save{
+      border-color:var(--accent2);
+      color:var(--accent2);
+    }
+
+    .btn-replace{
+      border-color:var(--warn);
+      color:var(--warn);
+      background:transparent;
+      cursor:pointer;
+    }
+
+    textarea{
+      width:100%;
+      height:calc(100vh - 140px);
+      background:#000;
+      color:#00ff88;
+      border:none;
+      padding:20px;
+      font-family:monospace;
+      font-size:13px;
+      outline:none;
+    }
+
+    .viewer{
+      width:100%;
+      height:70vh;
+      border:none;
+      border-radius:8px;
+      margin:20px 0;
+    }
+
+    .notice{
+      background:rgba(255,176,32,0.1);
+      border:1px solid var(--warn);
+      color:var(--warn);
+      padding:12px;
+      margin:20px;
+      border-radius:6px;
+      font-size:13px;
+    }
+
+    .replace-box{
+      background:var(--panel);
+      padding:20px;
+      border-top:1px solid var(--border);
+    }
+
+    .file-input{
+      margin-bottom:10px;
+      width:100%;
+    }
+
+    .actions{
+      padding:12px 20px;
+      display:flex;
+      justify-content:space-between;
+      background:var(--panel);
+      border-top:1px solid var(--border);
+    }
+
+  </style>
+</head>
+
+<body>
+
+<!-- ================= TEXT FILE ================= -->
+{% if is_text %}
+
+<form action="/save/{{ filename }}" method="post">
+
+<header>
+  <div class="filename">{{ filename }}</div>
+  <a href="/" class="btn">← BACK</a>
+</header>
+
+<textarea name="content">{{ content }}</textarea>
+
+<div class="actions">
+  <a href="/view/{{ filename }}" class="btn">CANCEL</a>
+  <button class="btn btn-save">💾 SAVE</button>
+</div>
+
+</form>
+
+<!-- ================= BINARY FILE ================= -->
+{% else %}
+
+<header>
+  <div class="filename">{{ filename }}</div>
+  <a href="/" class="btn">← BACK</a>
+</header>
+
+<div class="notice">
+  ⚠ Binary file — Use viewer or replace file
+</div>
+
+<!-- 🔥 SMART VIEWER -->
+{% if filename.endswith('.pdf') %}
+  <iframe class="viewer" src="/static/uploads/{{ filename }}"></iframe>
+
+{% elif filename.endswith('.docx') or filename.endswith('.doc') %}
+  <iframe class="viewer"
+    src="https://view.officeapps.live.com/op/embed.aspx?src={{ file_url }}">
+  </iframe>
+
+{% elif filename.endswith('.xlsx') or filename.endswith('.xls') %}
+  <iframe class="viewer"
+    src="https://view.officeapps.live.com/op/embed.aspx?src={{ file_url }}">
+  </iframe>
+
+{% elif filename.endswith('.png') or filename.endswith('.jpg') %}
+  <img src="/static/uploads/{{ filename }}" style="max-width:100%; border-radius:8px; margin:20px;">
+
+{% else %}
+  <div style="padding:20px;">
+    <a href="/download/{{ filename }}" class="btn">⬇ DOWNLOAD FILE</a>
+  </div>
+{% endif %}
+
+<!-- 🔥 REPLACE FILE -->
+<div class="replace-box">
+  <form action="/replace/{{ filename }}" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" class="file-input" required>
+    <button class="btn-replace">🔄 REPLACE FILE</button>
+  </form>
+</div>
+
+{% endif %}
+
+</body>
+</html>

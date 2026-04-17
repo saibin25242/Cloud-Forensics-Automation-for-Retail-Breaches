@@ -1,0 +1,37 @@
+Retail Store Sales Data
+
+
+
+Date: 2026-03-04
+
+Store ID: RS102
+
+Location: Bangalore
+
+
+
+Product: Laptop
+
+Quantity Sold: 5
+
+Price: 65000
+
+
+
+Product: Mobile Phone
+
+Quantity Sold: 10
+
+Price: 25000
+
+
+
+Product: Headphones
+
+Quantity Sold: 15
+
+Price: 200000006666666666
+
+
+
+Note: Data exported from POS system.
