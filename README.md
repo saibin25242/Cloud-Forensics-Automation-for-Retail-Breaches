@@ -1,6 +1,6 @@
 # 🛡 Retail Breach Forensics System
 
-So this is a real-time file monitoring and forensics tool I built using Python Flask, PostgreSQL, and Watchdog. The idea is simple — you drop files into a folder, and the system keeps an eye on them. Any time something changes (a file gets modified, deleted, or a new one appears), it logs everything into a database with SHA256 hashes so you have a full evidence trail.
+So this is a real-time file monitoring and forensics tool I built using Python Flask, PostgreSQL, and Watchdog. The idea is simple  you drop files into a folder, and the system keeps an eye on them. Any time something changes (a file gets modified, deleted, or a new one appears), it logs everything into a database with SHA256 hashes so you have a full evidence trail.
 
 It's genuinely useful for catching unauthorized file changes in a retail or enterprise environment.
 
@@ -270,6 +270,7 @@ The dashboard sorts by risk automatically, so the most critical stuff always sho
 4. Based on what changed, it assigns a status and risk level
 5. Everything gets saved to PostgreSQL
 6. The dashboard at `/admin` pulls the latest data and shows it in real time — charts, tables, the works
+7. if you need CSV report you generate it through export option where details of each file's name,path,time,hash value,status,scan time and risk level can be seen.
 
 ---
 
