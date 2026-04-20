@@ -1,0 +1,14 @@
+Payment Processing Log
+
+Transaction ID: TXN784512
+Payment Mode: Credit Card
+Amount: 12000
+Date: 2026-03-03
+
+Transaction ID: TXN784513
+Payment Mode: UPI
+Amount: 45000
+Date: 2026-03-07
+
+Status: Completed
+System: Retail Payment Gateway

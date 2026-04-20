@@ -1,0 +1,15 @@
+Employee Access Log
+
+Employee ID: EMP245
+Name: Rahul Sharma
+Department: IT Support
+
+Accessed Files:
+customer_database.csv
+sales_report.xlsx
+
+Access Time:
+2026-03-04 12:15:00
+
+Action:
+Viewed customer records
