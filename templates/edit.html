@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit File</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at top, #0b1220, #05070c);
+      color: #fff;
+      padding: 30px;
+    }
+
+    /* HEADER */
+    h2 {
+      text-align: center;
+      color: #00ffcc;
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+    }
+
+    /* FORM CONTAINER */
+    form {
+      max-width: 900px;
+      margin: auto;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(10px);
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 0 25px rgba(0,255,200,0.05);
+    }
+
+    /* TEXTAREA */
+    textarea {
+      width: 100%;
+      height: 420px;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #333;
+      background: #0a0f18;
+      color: #00ffcc;
+      font-family: 'Consolas', monospace;
+      font-size: 14px;
+      resize: none;
+      outline: none;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    textarea:focus {
+      border-color: #00ffcc;
+      box-shadow: 0 0 10px rgba(0,255,204,0.3);
+    }
+
+    /* SAVE BUTTON */
+    button {
+      margin-top: 15px;
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(90deg, #00ffcc, #00b8ff);
+      color: #000;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 15px rgba(0,255,200,0.4);
+    }
+
+    /* BACK BUTTON */
+    .back {
+      display: block;
+      text-align: center;
+      margin-top: 15px;
+      color: #00d4ff;
+      text-decoration: none;
+      font-size: 13px;
+    }
+
+    .back:hover {
+      text-decoration: underline;
+    }
+
+    /* TITLE BAR EFFECT */
+    .title-bar {
+      text-align: center;
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="title-bar">
+    🔐 Secure Forensic Editor Mode
+  </div>
+
+  <h2>✏️ Edit File: {{ filename }}</h2>
+
+  <form method="POST" action="/save/{{ filename }}">
+      <textarea name="content">{{ content }}</textarea>
+
+      <button type="submit">💾 Save Changes</button>
+  </form>
+
+  <a class="back" href="/">⬅ Back to Dashboard</a>
+
+</body>
+</html>

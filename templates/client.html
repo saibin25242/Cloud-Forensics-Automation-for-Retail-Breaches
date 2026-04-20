@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Secure File Upload Portal</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at top, #0b1220, #05070c);
+      color: #fff;
+    }
+
+    /* HEADER */
+    header {
+      text-align: center;
+      padding: 30px 10px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+      color: #00ffcc;
+      letter-spacing: 1px;
+    }
+
+    header p {
+      color: #aaa;
+      font-size: 13px;
+    }
+
+    /* CONTAINER */
+    .container {
+      width: 90%;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    /* CARD STYLE */
+    .card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(10px);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 20px rgba(0,255,200,0.05);
+    }
+
+    /* UPLOAD BOX */
+    input[type="file"] {
+      padding: 10px;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: #fff;
+      width: 70%;
+    }
+
+    button {
+      padding: 10px 16px;
+      background: linear-gradient(90deg, #00ffcc, #00b8ff);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      color: #000;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    /* FILE LIST */
+    .file-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      margin-bottom: 10px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 10px;
+      transition: 0.3s;
+    }
+
+    .file-item:hover {
+      background: rgba(0,255,200,0.08);
+    }
+
+    .file-name {
+      font-size: 14px;
+      color: #fff;
+    }
+
+    .actions a {
+      margin-left: 10px;
+      color: #00d4ff;
+      font-size: 13px;
+      text-decoration: none;
+    }
+
+    .actions a:hover {
+      text-decoration: underline;
+    }
+
+    /* DASHBOARD BUTTON */
+    .dashboard-btn {
+      display: block;
+      text-align: center;
+      margin-top: 10px;
+      padding: 12px;
+      background: rgba(0,255,200,0.1);
+      border: 1px solid #00ffcc;
+      border-radius: 10px;
+      color: #00ffcc;
+      text-decoration: none;
+    }
+
+    .dashboard-btn:hover {
+      background: rgba(0,255,200,0.2);
+    }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      font-size: 12px;
+      color: #555;
+      margin-top: 20px;
+      padding-bottom: 20px;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>🔐 Secure File Upload Portal</h1>
+  <p>Upload and manage your files securely</p>
+</header>
+
+<div class="container">
+
+  <!-- UPLOAD -->
+  <div class="card">
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+      <input type="file" name="file" required>
+      <button type="submit">⬆ Upload File</button>
+    </form>
+  </div>
+
+
+
+  <!-- FILE LIST -->
+  <div class="card">
+    <h3>📁 Your Files</h3>
+
+    <ul class="file-list" id="fileList">
+      <li>Loading files...</li>
+    </ul>
+  </div>
+
+</div>
+
+<footer>
+  CloudForensics System © 2026
+</footer>
+
+<script>
+async function loadFiles() {
+  try {
+    const res = await fetch('/api/evidence');
+    const data = await res.json();
+
+    const list = document.getElementById("fileList");
+    list.innerHTML = "";
+
+    if (!data.length) {
+      list.innerHTML = "<li>No files uploaded</li>";
+      return;
+    }
+
+    data.forEach(file => {
+      list.innerHTML += `
+        <li class="file-item">
+          <span class="file-name">📄 ${file.file_name}</span>
+
+          <div class="actions">
+            <a href="/view/${file.file_name}">View</a>
+            <a href="/edit/${file.file_name}">Edit</a>
+            <a href="/download/${file.file_name}">Download</a>
+          </div>
+        </li>
+      `;
+    });
+
+  } catch (err) {
+    console.log("Error loading files", err);
+  }
+}
+
+loadFiles();
+setInterval(loadFiles, 3000);
+</script>
+
+</body>
+</html>

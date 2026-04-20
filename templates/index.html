@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Retail Breach Forensics Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #0a0f18;
+      color: #fff;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #00e5ff;
+      margin-bottom: 10px;
+    }
+
+    .sub {
+      text-align: center;
+      color: #aaa;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: #111827;
+      padding: 15px;
+      border-radius: 12px;
+      text-align: center;
+      border: 1px solid #1f2937;
+    }
+
+    .value {
+      font-size: 22px;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+
+    .danger { color: #ff4d4d; }
+    .warn { color: #ffb020; }
+    .safe { color: #00ff88; }
+
+    .charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 20px 0;
+    }
+
+    .chartBox {
+      background: #111827;
+      padding: 15px;
+      border-radius: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      background: #0f172a;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #1e293b;
+      font-size: 13px;
+    }
+
+    th {
+      color: #00e5ff;
+      background: #111827;
+    }
+
+    .badge {
+      padding: 4px 8px;
+      border-radius: 5px;
+      font-size: 11px;
+    }
+
+    .MODIFIED { background: #ff4d4d; }
+    .NEW { background: #ffb020; color: black; }
+    .UNCHANGED { background: #00ff88; color: black; }
+
+    .risk-HIGH { color: #ff4d4d; font-weight: bold; }
+    .risk-MEDIUM { color: #ffb020; font-weight: bold; }
+    .risk-LOW { color: #00ff88; font-weight: bold; }
+
+    .section {
+      margin-top: 20px;
+    }
+    /* =========================
+   RESPONSIVE DESIGN
+   ========================= */
+
+/* Tablets */
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .charts {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 18px;
+  }
+
+  .sub {
+    font-size: 11px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    padding: 12px;
+  }
+
+  .value {
+    font-size: 18px;
+  }
+
+  table {
+    font-size: 11px;
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  th, td {
+    padding: 8px;
+  }
+
+  .chartBox {
+    padding: 10px;
+  }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
+  h1 {
+    font-size: 16px;
+  }
+
+  .value {
+    font-size: 16px;
+  }
+
+  .badge {
+    font-size: 10px;
+  }
+}
+  </style>
+</head>
+
+<body>
+
+<h1>🛡 RETAIL BREACH FORENSICS DASHBOARD</h1>
+<div class="sub">REAL-TIME EVIDENCE COLLECTOR v1.0</div>
+
+<!-- STATS -->
+<div class="grid">
+  <div class="card">Total Files<div class="value" id="total">0</div></div>
+  <div class="card danger">Modified<div class="value" id="modified">0</div></div>
+  <div class="card warn">New<div class="value" id="new">0</div></div>
+  <div class="card safe">Unchanged<div class="value" id="unchanged">0</div></div>
+  <div class="card">Risk Level<div class="value" id="risk">LOW</div></div>
+</div>
+
+<!-- CHARTS -->
+<div class="charts">
+
+  <div class="chartBox">
+    <h3>📊 Status Distribution</h3>
+    <canvas id="pieChart"></canvas>
+  </div>
+
+  <div class="chartBox">
+    <h3>📈 Risk Trend</h3>
+    <canvas id="barChart"></canvas>
+  </div>
+
+</div>
+
+<!-- TABLE -->
+<div class="section">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h3>📄 Evidence Log</h3>
+    <a href="/api/export" 
+       style="padding:8px 16px; background:linear-gradient(90deg,#00ffcc,#00b8ff);
+              color:#000; font-weight:bold; border-radius:8px; text-decoration:none;
+              font-size:13px;">
+      ⬇ Export CSV
+    </a>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>File</th>
+        <th>Status</th>
+        <th>SHA256</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+    <tbody id="table"></tbody>
+  </table>
+</div>
+
+<!-- HISTORY -->
+<div class="section">
+  <h3>⏱ Live Scan History</h3>
+  <canvas id="lineChart"></canvas>
+</div>
+
+<script>
+
+let pieChart, barChart, lineChart;
+
+async function loadDashboard() {
+
+  const summary = await fetch('/api/summary').then(r => r.json());
+  const evidence = await fetch('/api/evidence').then(r => r.json());
+
+  // =========================
+  // STATS
+  // =========================
+  document.getElementById("total").innerText = summary.total;
+  document.getElementById("modified").innerText = summary.modified;
+  document.getElementById("new").innerText = summary.new;
+  document.getElementById("unchanged").innerText = summary.unchanged;
+
+  const risk =
+    summary.modified > 0 ? "HIGH" :
+    summary.new > 0 ? "MEDIUM" : "LOW";
+
+  document.getElementById("risk").innerText = risk;
+  document.getElementById("risk").className = "value risk-" + risk;
+
+  // =========================
+  // TABLE
+  // =========================
+  document.getElementById("table").innerHTML = evidence.map(r => `
+    <tr>
+      <td>${r.file_name}</td>
+      <td><span class="badge ${r.status}">${r.status}</span></td>
+      <td title="${r.sha256}">${r.sha256?.slice(0,20)}...</td>
+      <td>${r.scan_time}</td>
+    </tr>
+  `).join("");
+
+  // =========================
+  // PIE CHART
+  // =========================
+  if (pieChart) pieChart.destroy();
+
+  pieChart = new Chart(document.getElementById("pieChart"), {
+    type: "pie",
+    data: {
+      labels: ["Modified", "New", "Unchanged"],
+      datasets: [{
+        data: [summary.modified, summary.new, summary.unchanged],
+        backgroundColor: ["#ff4d4d", "#ffb020", "#00ff88"]
+      }]
+    }
+  });
+
+  // =========================
+  // BAR CHART (RISK)
+  // =========================
+  if (barChart) barChart.destroy();
+
+  barChart = new Chart(document.getElementById("barChart"), {
+    type: "bar",
+    data: {
+      labels: ["High Risk", "Medium", "Safe"],
+      datasets: [{
+        data: [summary.modified, summary.new, summary.unchanged],
+        backgroundColor: ["#ff4d4d", "#ffb020", "#00ff88"]
+      }]
+    }
+  });
+
+  // =========================
+  // LINE CHART (TREND)
+  // =========================
+  const history = await fetch('/api/history').then(r => r.json());
+
+  if (lineChart) lineChart.destroy();
+
+  lineChart = new Chart(document.getElementById("lineChart"), {
+    type: "line",
+    data: {
+      labels: history.map(h => h.scan_time),
+      datasets: [
+        {
+          label: "Modified",
+          data: history.map(h => h.modified),
+          borderColor: "#ff4d4d"
+        },
+        {
+          label: "New",
+          data: history.map(h => h.new),
+          borderColor: "#ffb020"
+        },
+        {
+          label: "Unchanged",
+          data: history.map(h => h.unchanged),
+          borderColor: "#00ff88"
+        }
+      ]
+    }
+  });
+
+}
+
+// AUTO REFRESH (REAL TIME)
+setInterval(loadDashboard, 3000);
+loadDashboard();
+
+</script>
+
+</body>
+</html>
